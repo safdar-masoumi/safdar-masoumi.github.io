@@ -108,88 +108,82 @@
     </div>
 
     <!-- JavaScript Logic -->
-    <script>
-        // Wait for the DOM to be fully loaded
-        document.addEventListener('DOMContentLoaded', () => {
-            const form = document.getElementById('ckm-form');
-            const resultContainer = document.getElementById('result-container');
-            const scoreDisplay = document.getElementById('score-display');
-            const errorMessage = document.getElementById('error-message');
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const form = document.getElementById('ckm-form');
+        const resultContainer = document.getElementById('result-container');
+        const scoreDisplay = document.getElementById('score-display');
+        const errorMessage = document.getElementById('error-message');
 
-            // Listen for form submission
-            form.addEventListener('submit', (e) => {
-                e.preventDefault(); // Prevent page reload
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            resultContainer.classList.add('hidden');
+            errorMessage.classList.add('hidden');
 
-                // Hide previous results/errors
-                resultContainer.classList.add('hidden');
-                errorMessage.classList.add('hidden');
+            const gender = document.getElementById('gender').value;
+            const age = parseFloat(document.getElementById('age').value);
+            const sbp = parseFloat(document.getElementById('sbp').value);
+            const wc = parseFloat(document.getElementById('wc').value);
+            const fpg = parseFloat(document.getElementById('fpg').value);
+            const tg = parseFloat(document.getElementById('tg').value);
+            const hdlc = parseFloat(document.getElementById('hdlc').value);
+            const egfr = parseFloat(document.getElementById('egfr').value);
 
-                // Get values from the form
-                const gender = document.getElementById('gender').value;
-                const age = parseFloat(document.getElementById('age').value);
-                const sbp = parseFloat(document.getElementById('sbp').value);
-                const wc = parseFloat(document.getElementById('wc').value);
-                const fpg = parseFloat(document.getElementById('fpg').value);
-                const tg = parseFloat(document.getElementById('tg').value);
-                const hdlc = parseFloat(document.getElementById('hdlc').value);
-                const egfr = parseFloat(document.getElementById('egfr').value);
-
-                // --- Input Validation ---
-                if (!gender || isNaN(age) || isNaN(sbp) || isNaN(wc) || isNaN(fpg) || isNaN(tg) || isNaN(hdlc) || isNaN(egfr)) {
-                    showError('Please fill out all fields with valid numbers.');
-                    return;
-                }
-
-                if (age < 20 || age > 80) {
-                    showError('Age must be between 20 and 80 to use these formulas.');
-                    return;
-                }
-                
-                // --- Calculation Logic ---
-                let score = 0;
-
-                if (gender === 'men') {
-                    if (age >= 20 && age <= 39) {
-                        // Men 20–39
-                        score = (0.09 * sbp) + (0.17 * wc) + (0.05 * fpg) + (0.68 * tg) - (0.28 * hdlc) - (0.06 * egfr);
-                    } else if (age >= 40 && age <= 59) {
-                        // Men 40–59
-                        score = (0.10 * sbp) + (0.23 * wc) + (0.06 * fpg) + (0.56 * tg) - (0.40 * hdlc) - (0.04 * egfr);
-                    } else if (age >= 60 && age <= 80) {
-                        // Men 60–80
-                        score = (0.07 * sbp) + (0.24 * wc) + (0.08 * fpg) + (0.55 * tg) - (0.39 * hdlc) - (0.06 * egfr);
-                    }
-                } else if (gender === 'women') {
-                    if (age >= 20 && age <= 39) {
-                        // Women 20–39
-                        score = (0.21 * sbp) + (0.31 * wc) + (0.22 * fpg) + (0.48 * tg) - (0.25 * hdlc) - (0.06 * egfr);
-                    } else if (age >= 40 && age <= 59) {
-                        // Women 40–59
-                        score = (0.08 * sbp) + (0.14 * wc) + (0.06 * fpg) + (0.72 * tg) - (0.22 * hdlc) - (0.05 * egfr);
-                    } else if (age >= 60 && age <= 80) {
-                        // Women 60–80
-                        score = (0.07 * sbp) + (0.13 * wc) + (0.08 * fpg) + (0.64 * tg) - (0.36 * hdlc) - (0.04 * egfr);
-                    }
-                }
-
-                // --- Display Result ---
-                scoreDisplay.textContent = score.toFixed(2); // Round to 2 decimal places
-                resultContainer.classList.remove('hidden');
-            });
-
-            // Listen for form reset
-            form.addEventListener('reset', () => {
-                resultContainer.classList.add('hidden');
-                errorMessage.classList.add('hidden');
-            });
-
-            // Helper function to show errors
-            function showError(message) {
-                errorMessage.textContent = message;
-                errorMessage.classList.remove('hidden');
+            if (!gender || [age, sbp, wc, fpg, tg, hdlc, egfr].some(isNaN)) {
+                showError('Please fill out all fields with valid numbers.');
+                return;
             }
+            if (age < 20 || age > 80) {
+                showError('Age must be between 20 and 80 to use these formulas.');
+                return;
+            }
+
+            // --- CKM score formula ---
+            let score = 0;
+            if (gender === 'men') {
+                if (age >= 20 && age <= 39) {
+                    score = (0.09 * sbp) + (0.17 * wc) + (0.05 * fpg) + (0.68 * tg) - (0.28 * hdlc) - (0.06 * egfr);
+                } else if (age >= 40 && age <= 59) {
+                    score = (0.10 * sbp) + (0.23 * wc) + (0.06 * fpg) + (0.56 * tg) - (0.40 * hdlc) - (0.04 * egfr);
+                } else if (age >= 60 && age <= 80) {
+                    score = (0.07 * sbp) + (0.24 * wc) + (0.08 * fpg) + (0.55 * tg) - (0.39 * hdlc) - (0.06 * egfr);
+                }
+            } else if (gender === 'women') {
+                if (age >= 20 && age <= 39) {
+                    score = (0.21 * sbp) + (0.31 * wc) + (0.22 * fpg) + (0.48 * tg) - (0.25 * hdlc) - (0.06 * egfr);
+                } else if (age >= 40 && age <= 59) {
+                    score = (0.08 * sbp) + (0.14 * wc) + (0.06 * fpg) + (0.72 * tg) - (0.22 * hdlc) - (0.05 * egfr);
+                } else if (age >= 60 && age <= 80) {
+                    score = (0.07 * sbp) + (0.13 * wc) + (0.08 * fpg) + (0.64 * tg) - (0.36 * hdlc) - (0.04 * egfr);
+                }
+            }
+
+            // --- Normalize score to [-3, +3] ---
+            const minScore = -250;
+            const maxScore = 250;
+            let normalized = ((score - minScore) / (maxScore - minScore)) * 6 - 3;
+
+            // Clamp to ensure no overflow
+            normalized = Math.max(-3, Math.min(3, normalized));
+
+            // --- Display Result ---
+            scoreDisplay.textContent = normalized.toFixed(2);
+            resultContainer.classList.remove('hidden');
         });
-    </script>
+
+        form.addEventListener('reset', () => {
+            resultContainer.classList.add('hidden');
+            errorMessage.classList.add('hidden');
+        });
+
+        function showError(msg) {
+            errorMessage.textContent = msg;
+            errorMessage.classList.remove('hidden');
+        }
+    });
+</script>
+
+
 
 </body>
 </html>
